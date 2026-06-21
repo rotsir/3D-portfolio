@@ -96,7 +96,6 @@ body {
   pointer-events: none;
   z-index: 1000;
   transform: translate(-50%, -50%);
-  backdrop-filter: invert(100%);
   will-change: transform, width, height, border-radius;
   transform-origin: center center;
 }
@@ -112,7 +111,6 @@ body {
   pointer-events: none;
   z-index: 1001;
   transform: translate(-50%, -50%);
-  backdrop-filter: invert(100%);
 }
 
 /* Hide custom cursors on mobile screens */

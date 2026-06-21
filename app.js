@@ -67,9 +67,9 @@ const SKILLS_MAP = {
 
 // --- Sound Effects Setup ---
 const pressSound = new Audio('assets/keycap-sounds/press.mp3');
-pressSound.volume = 0.5;
+pressSound.volume = 0.8;
 const releaseSound = new Audio('assets/keycap-sounds/release.mp3');
-releaseSound.volume = 0.4;
+releaseSound.volume = 0.7;
 
 const playPress = () => {
   pressSound.currentTime = 0;
@@ -388,6 +388,80 @@ function setupSplineEvents() {
     }
   };
 
+  // Sparkles/sprinkles effect for skills
+  let activeSprinkles = [];
+
+  const spawnSprinkles = (text, startX, startY) => {
+    if (window.innerWidth <= 768) return; // Disable on mobile to prevent performance lag
+
+    const container = document.body;
+    const colors = ['#6366f1', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+
+    const el = document.createElement('span');
+    el.innerText = text;
+    el.style.position = 'fixed';
+    el.style.left = `${startX}px`;
+    el.style.top = `${startY}px`;
+    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.fontSize = '24px'; // Base size
+    el.style.fontWeight = '900';
+    el.style.pointerEvents = 'none';
+    el.style.zIndex = '9999';
+    el.style.userSelect = 'none';
+    el.style.fontFamily = 'var(--font-sans)';
+    el.style.textShadow = '0 0 12px rgba(0, 0, 0, 0.8), 0 0 5px rgba(255, 255, 255, 0.3)';
+    el.style.opacity = '1.0';
+
+    container.appendChild(el);
+
+    // Animate single text label coming "toward the screen" (scaling up) for 3 seconds
+    const tween = gsap.fromTo(el,
+      {
+        xPercent: -50,
+        yPercent: -50,
+        scale: 0.3,
+        x: 0,
+        y: 0,
+        opacity: 1.0
+      },
+      {
+        xPercent: -50,
+        yPercent: -50,
+        x: (Math.random() - 0.5) * 50, // Slight horizontal sway
+        y: -150, // Move upward
+        scale: 3.5, // Scale up to fly "toward the screen"
+        opacity: 1.0, // Keep fully solid!
+        rotation: (Math.random() - 0.5) * 20, // Gentle sway rotation
+        duration: 3.0, // Animate for 3 seconds
+        ease: 'power1.out',
+        onComplete: () => {
+          activeSprinkles = activeSprinkles.filter(item => item.el !== el);
+          el.remove();
+        }
+      }
+    );
+
+    // Add to active tracking list
+    activeSprinkles.push({ el, tween });
+
+    // Limit active sprinkles to 8: immediately fade out and remove the oldest
+    if (activeSprinkles.length > 8) {
+      const oldest = activeSprinkles.shift();
+      if (oldest) {
+        oldest.tween.kill();
+        gsap.to(oldest.el, {
+          opacity: 0,
+          scale: 4.0, // Expand a bit more as it fades
+          duration: 0.2, // Quick fade out
+          ease: 'power2.out',
+          onComplete: () => {
+            oldest.el.remove();
+          }
+        });
+      }
+    }
+  };
+
   let hoveredSkill = null;
 
   // Listen for keydown / hover events from the 3D scene
@@ -417,8 +491,10 @@ function setupSplineEvents() {
 
       if (showInfo) {
         updateDetails(targetName);
-        splineApp.setVariable("heading", SKILLS_MAP[targetName].label);
-        splineApp.setVariable("desc", SKILLS_MAP[targetName].desc);
+        spawnSprinkles(SKILLS_MAP[targetName].label, mouse.x, mouse.y);
+        // Temporarily disabled hover showing skill info
+        // splineApp.setVariable("heading", SKILLS_MAP[targetName].label);
+        // splineApp.setVariable("desc", SKILLS_MAP[targetName].desc);
       } else {
         splineApp.setVariable("heading", "");
         splineApp.setVariable("desc", "");
