@@ -8,7 +8,9 @@ let bongoFrame1 = null;
 let bongoFrame2 = null;
 let bongoInterval = null;
 let activeSection = 'hero';
-
+const pos = { x: 0, y: 0 };
+const mouse = { x: 0, y: 0 };
+const vel = { x: 0, y: 0 };
 // Function to control 3D text object visibility based on scroll section
 function updateTextVisibility() {
   if (!splineApp) return;
@@ -315,6 +317,14 @@ function setupScrollAnimations() {
     activeSection = section;
     updateTextVisibility();
 
+    // Close skill details popup if we scroll away from skills
+    if (section !== "skills") {
+      const popup = document.getElementById('skill-details-popup');
+      if (popup) {
+        popup.classList.remove('active');
+      }
+    }
+
     // Hero rotation
     if (section === "hero") {
       startHeroRotation();
@@ -374,95 +384,68 @@ function setupScrollAnimations() {
 function setupSplineEvents() {
   if (!splineApp) return;
 
-  const titleEl = document.getElementById('skill-title');
-  const descEl = document.getElementById('skill-desc');
+  const popup = document.getElementById('skill-details-popup');
+  const titleEl = document.getElementById('skill-popup-title');
+  const descEl = document.getElementById('skill-popup-desc');
 
-  const updateDetails = (skillName) => {
+  let popupTimeout = null;
+  let hoveredSkill = null;
+
+  const updateDetails = (skillName, clientX, clientY) => {
     const data = SKILLS_MAP[skillName];
     if (data) {
+      if (popupTimeout) {
+        clearTimeout(popupTimeout);
+        popupTimeout = null;
+      }
       if (titleEl) titleEl.innerText = data.label;
       if (descEl) descEl.innerText = data.desc;
-    } else {
-      if (titleEl) titleEl.innerText = "Select a Skill";
-      if (descEl) descEl.innerText = "Hover over a keycap or press keys on your keyboard to reveal details.";
-    }
-  };
 
-  // Sparkles/sprinkles effect for skills
-  let activeSprinkles = [];
+      if (popup) {
+        // Dynamic positioning next to keyboard / hovered key (on desktop)
+        if (window.innerWidth > 768) {
+          if (clientX !== undefined && clientY !== undefined) {
+            const cardWidth = 380;
+            const cardHeight = popup.offsetHeight || 150; // fallback height estimate
 
-  const spawnSprinkles = (text, startX, startY) => {
-    if (window.innerWidth <= 768) return; // Disable on mobile to prevent performance lag
+            // Place card to the right of cursor with a small offset
+            let leftPos = clientX + 30;
+            let topPos = clientY - cardHeight / 2;
 
-    const container = document.body;
-    const colors = ['#6366f1', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+            // If the card would clip off the right screen boundary, place it to the left of the cursor instead
+            if (leftPos + cardWidth > window.innerWidth) {
+              leftPos = clientX - cardWidth - 30;
+            }
+            if (leftPos < 20) leftPos = 20;
 
-    const el = document.createElement('span');
-    el.innerText = text;
-    el.style.position = 'fixed';
-    el.style.left = `${startX}px`;
-    el.style.top = `${startY}px`;
-    el.style.color = colors[Math.floor(Math.random() * colors.length)];
-    el.style.fontSize = '24px'; // Base size
-    el.style.fontWeight = '900';
-    el.style.pointerEvents = 'none';
-    el.style.zIndex = '9999';
-    el.style.userSelect = 'none';
-    el.style.fontFamily = 'var(--font-sans)';
-    el.style.textShadow = '0 0 12px rgba(0, 0, 0, 0.8), 0 0 5px rgba(255, 255, 255, 0.3)';
-    el.style.opacity = '1.0';
+            // Constrain vertically within screen boundaries (accounting for top header overlap)
+            const minTop = 100;
+            const maxTop = window.innerHeight - cardHeight - 30;
+            topPos = Math.max(minTop, Math.min(topPos, maxTop));
 
-    container.appendChild(el);
-
-    // Animate single text label coming "toward the screen" (scaling up) for 3 seconds
-    const tween = gsap.fromTo(el,
-      {
-        xPercent: -50,
-        yPercent: -50,
-        scale: 0.3,
-        x: 0,
-        y: 0,
-        opacity: 1.0
-      },
-      {
-        xPercent: -50,
-        yPercent: -50,
-        x: (Math.random() - 0.5) * 50, // Slight horizontal sway
-        y: -150, // Move upward
-        scale: 3.5, // Scale up to fly "toward the screen"
-        opacity: 1.0, // Keep fully solid!
-        rotation: (Math.random() - 0.5) * 20, // Gentle sway rotation
-        duration: 3.0, // Animate for 3 seconds
-        ease: 'power1.out',
-        onComplete: () => {
-          activeSprinkles = activeSprinkles.filter(item => item.el !== el);
-          el.remove();
-        }
-      }
-    );
-
-    // Add to active tracking list
-    activeSprinkles.push({ el, tween });
-
-    // Limit active sprinkles to 8: immediately fade out and remove the oldest
-    if (activeSprinkles.length > 8) {
-      const oldest = activeSprinkles.shift();
-      if (oldest) {
-        oldest.tween.kill();
-        gsap.to(oldest.el, {
-          opacity: 0,
-          scale: 4.0, // Expand a bit more as it fades
-          duration: 0.2, // Quick fade out
-          ease: 'power2.out',
-          onComplete: () => {
-            oldest.el.remove();
+            popup.style.left = `${leftPos}px`;
+            popup.style.top = `${topPos}px`;
+          } else {
+            // Default backup position next to keyboard model (e.g. left side of viewport)
+            const cardHeight = popup.offsetHeight || 150;
+            popup.style.left = '80px';
+            popup.style.top = `${(window.innerHeight - cardHeight) / 2}px`;
           }
-        });
+        }
+        popup.classList.add('active');
       }
+
+      popupTimeout = setTimeout(() => {
+        if (popup) popup.classList.remove('active');
+        popupTimeout = null;
+        hoveredSkill = null; // Allow re-hovering the same key to trigger the details card again
+      }, 3000);
+    } else {
+      // Don't close immediately, let the 3-second timer handle it
     }
   };
 
-  let hoveredSkill = null;
+
 
   // Listen for keydown / hover events from the 3D scene
   splineApp.addEventListener('mouseHover', (e) => {
@@ -490,8 +473,7 @@ function setupSplineEvents() {
       hoveredSkill = targetName;
 
       if (showInfo) {
-        updateDetails(targetName);
-        spawnSprinkles(SKILLS_MAP[targetName].label, mouse.x, mouse.y);
+        updateDetails(targetName, mouse.x, mouse.y);
         // Temporarily disabled hover showing skill info
         // splineApp.setVariable("heading", SKILLS_MAP[targetName].label);
         // splineApp.setVariable("desc", SKILLS_MAP[targetName].desc);
@@ -509,7 +491,7 @@ function setupSplineEvents() {
     if (SKILLS_MAP[targetName]) {
       playPress();
       if (showInfo) {
-        updateDetails(targetName);
+        updateDetails(targetName, mouse.x, mouse.y);
         splineApp.setVariable("heading", SKILLS_MAP[targetName].label);
         splineApp.setVariable("desc", SKILLS_MAP[targetName].desc);
       }
@@ -526,10 +508,6 @@ function setupSplineEvents() {
 // --- 4. Custom Elastic Jelly Cursor Physics ---
 const jellyCursor = document.getElementById('custom-cursor-jelly');
 const dotCursor = document.getElementById('custom-cursor-dot');
-
-const pos = { x: 0, y: 0 };
-const mouse = { x: 0, y: 0 };
-const vel = { x: 0, y: 0 };
 
 let isHovering = false;
 

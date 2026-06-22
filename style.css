@@ -637,6 +637,91 @@ footer .socials a:hover {
   color: var(--text-primary);
 }
 
+/* --- Skills Section Side-by-Side Layout & Popup --- */
+.skills-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 3rem;
+  pointer-events: none;
+}
+
+.skills-header {
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.skills-header h2,
+.skills-header .hint {
+  pointer-events: auto;
+}
+
+.skill-details-popup {
+  width: 380px;
+  position: fixed;
+  z-index: 100;
+  background: rgba(10, 10, 12, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 
+              0 0 100px rgba(99, 102, 241, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, 
+              box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.skill-details-popup.active {
+  opacity: 1;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 
+              0 0 40px rgba(99, 102, 241, 0.25);
+  pointer-events: auto;
+}
+
+.skill-details-popup::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.skill-details-popup.active::before {
+  opacity: 1;
+}
+
+.skill-details-popup h3 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+  background: linear-gradient(135deg, #ffffff 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.skill-details-popup p {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
 /* ======================================================
    MOBILE RESPONSIVE STYLES
    ====================================================== */
@@ -738,8 +823,30 @@ footer .socials a:hover {
 
   /* --- Skills --- */
   #skills {
-    min-height: 150vh;
+    min-height: 120vh;
     padding-top: 6rem;
+  }
+
+  .skills-layout {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .skills-header {
+    max-width: 100% !important;
+  }
+
+  .skill-details-popup {
+    width: 90% !important;
+    max-width: 380px !important;
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 30px !important;
+    top: auto !important;
+    padding: 1.25rem !important;
   }
 
   .hint {
