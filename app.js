@@ -47,24 +47,24 @@ function updateTextVisibility() {
 // --- Skill Placeholder Data ---
 // You can edit the titles and descriptions below to customize your skill labels!
 const SKILLS_MAP = {
-  js: { label: "JavaScript", desc: "|JavaScript| The language that brings websites and interactive designs to life." },
-  bootstrap: { label: "Bootstrap", desc: "|Bootstrap| Rapid responsive design and layout development with UI components." },
-  html: { label: "HTML5", desc: "|HTML5| The markup standard for structuring modern, accessible web interfaces." },
-  css: { label: "CSS3", desc: "|CSS3| Turning layouts into highly interactive and beautifully styled experiences." },
-  php: { label: "PHP", desc: "|PHP| Backend web development scripting language for server-side logic." },
-  cp: { label: "cPanel", desc: "|cPanel| Configuring server hosting, databases, and website deployments." },
-  capcut: { label: "CapCut", desc: "|CapCut| Fast-paced video editing and engaging short-form content creation." },
-  prepro: { label: "Premiere Pro", desc: "|Premiere Pro| Industry-standard, professional video editing and audio syncing." },
-  youtube: { label: "YouTube Content", desc: "|YouTube Content| Crafting engaging, retention-optimized videos for YouTube channels." },
-  figma: { label: "Figma", desc: "|Figma| Creating mockups, prototypes, and collaborative UI/UX designs." },
-  obs: { label: "OBS Studio", desc: "|OBS Studio| Live streaming broadcast management and screen recording setups." },
-  photoshop: { label: "Photoshop", desc: "|Photoshop| Graphic design, photo editing, and creative visual artwork design." },
-  vercel: { label: "Vercel", desc: "|Vercel| Hosting and serverless deployment platform for modern web applications." },
-  git: { label: "Git", desc: "|Git| Version control system for tracking codebase changes and branching." },
-  github: { label: "GitHub", desc: "|GitHub| Collaborative platform for cloud version control and repository management." },
-  godaddy: { label: "GoDaddy", desc: "|GoDaddy| Domain registration, hosting setup, and DNS record management." },
-  firebase: { label: "Firebase", desc: "|Firebase| NoSQL databases, authentication, and hosting for real-time applications." },
-  wordpress: { label: "WordPress", desc: "|WordPress| Building custom themes, plugins, and scalable content management systems." }
+  js: { label: "JavaScript", desc: "The language that brings websites and interactive designs to life." },
+  bootstrap: { label: "Bootstrap", desc: "Rapid responsive design and layout development with UI components." },
+  html: { label: "HTML5", desc: "The markup standard for structuring modern, accessible web interfaces." },
+  css: { label: "CSS3", desc: "Turning layouts into highly interactive and beautifully styled experiences." },
+  php: { label: "PHP", desc: "Backend web development scripting language for server-side logic." },
+  cp: { label: "cPanel", desc: "Configuring server hosting, databases, and website deployments." },
+  capcut: { label: "CapCut", desc: "Fast-paced video editing and engaging short-form content creation." },
+  prepro: { label: "Premiere Pro", desc: "Industry-standard, professional video editing and audio syncing." },
+  youtube: { label: "YouTube Content", desc: "Crafting engaging, retention-optimized videos for YouTube channels." },
+  figma: { label: "Figma", desc: "Creating mockups, prototypes, and collaborative UI/UX designs." },
+  obs: { label: "OBS Studio", desc: "Live streaming broadcast management and screen recording setups." },
+  photoshop: { label: "Photoshop", desc: "Graphic design, photo editing, and creative visual artwork design." },
+  vercel: { label: "Vercel", desc: "Hosting and serverless deployment platform for modern web applications." },
+  git: { label: "Git", desc: "Version control system for tracking codebase changes and branching." },
+  github: { label: "GitHub", desc: "Collaborative platform for cloud version control and repository management." },
+  godaddy: { label: "GoDaddy", desc: "Domain registration, hosting setup, and DNS record management." },
+  firebase: { label: "Firebase", desc: "NoSQL databases, authentication, and hosting for real-time applications." },
+  wordpress: { label: "WordPress", desc: "Building custom themes, plugins, and scalable content management systems." }
 };
 
 // --- Sound Effects Setup ---
@@ -185,7 +185,7 @@ function setupScrollAnimations() {
       position: isMobile ? { x: 0, y: -40, z: 0 } : { x: 100, y: -40, z: 0 },
       rotation: isMobile ? { x: 0, y: Math.PI / 6, z: 0 } : { x: 0, y: Math.PI / 12, z: 0 },
     },
-    experience: {
+    about: {
       scale: isMobile ? { x: 0.3, y: 0.3, z: 0.3 } : { x: 0.25, y: 0.25, z: 0.25 },
       position: { x: 0, y: -40, z: 0 },
       rotation: isMobile ? { x: Math.PI / 6, y: -Math.PI / 6, z: 0 } : { x: Math.PI / 12, y: -Math.PI / 4, z: 0 },
@@ -375,8 +375,8 @@ function setupScrollAnimations() {
 
   // Section transitions mapping
   createSectionTimeline("#skills", "skills", "hero");
-  createSectionTimeline("#experience", "experience", "skills");
-  createSectionTimeline("#projects", "projects", "experience", "top 70%");
+  createSectionTimeline("#about", "about", "skills");
+  createSectionTimeline("#projects", "projects", "about", "top 70%");
   createSectionTimeline("#contact", "contact", "projects", "top 30%");
 }
 
