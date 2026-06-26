@@ -503,6 +503,28 @@ function setupSplineEvents() {
     splineApp.setVariable("heading", "");
     splineApp.setVariable("desc", "");
   });
+
+  // Tap/Click listeners (specifically support mobile touch presses)
+  splineApp.addEventListener('mouseDown', (e) => {
+    const targetName = e.target.name;
+    const showInfo = (activeSection === 'skills');
+
+    if (SKILLS_MAP[targetName]) {
+      playPress();
+      if (showInfo) {
+        const x = e.clientX || mouse.x;
+        const y = e.clientY || mouse.y;
+        updateDetails(targetName, x, y);
+      }
+    }
+  });
+
+  splineApp.addEventListener('mouseUp', (e) => {
+    const targetName = e.target.name;
+    if (SKILLS_MAP[targetName]) {
+      playRelease();
+    }
+  });
 }
 
 // --- 4. Custom Elastic Jelly Cursor Physics ---
